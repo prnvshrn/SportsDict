@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Row, Col, FormControl, FormGroup} from 'react-bootstrap';
+import {Row, Col, FormControl, FormGroup, Grid} from 'react-bootstrap';
 import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 import {Query, ApolloProvider} from 'react-apollo';
@@ -17,7 +17,11 @@ const football_query = gql`
 		    position,
 		    goals,
 		    chances_created,
-		    defensive_actions
+		    defensive_actions,
+		    shot_accuracy,
+		    pass_accuracy,
+		    duels_won,
+		    defensive_errors
 		  }
 		}`;
 
@@ -30,7 +34,8 @@ class FootballPanel extends Component{
     this.state = {
       value: '',
       value2: '',
-      player1_stats: []
+      player1_stats: [],
+      player2_stats: []
     };
   }
 
@@ -44,10 +49,9 @@ class FootballPanel extends Component{
 
 
 	render(){
-		console.log(this.state.player1_stats);
-
 		return(
 			<div>
+			<Grid>
 			<Row>
 			<form>
 				<Col xs={8} md={5}>
@@ -82,10 +86,9 @@ class FootballPanel extends Component{
 			  >
 			    {({ loading, error, data }) => {
 			      if (loading) return <p>Loading...</p>;
-			      if (data) { this.state.player1_stats = data.football; console.log(this.state.player1_stats);
+			      if (data) { this.state.player1_stats = data.football; 
 			      return data.football.map(({ name, position, chances_created }) => (
 			        <div key={name}>
-			          <p>{name}{position}</p>
 			        </div>
 			      ));}
 			    }}
@@ -100,18 +103,18 @@ class FootballPanel extends Component{
 			  >
 			    {({ loading, error, data }) => {
 			      if (loading) return <p>Loading...</p>;
-
+			      if(data){ this.state.player2_stats = data.football;
 			      return data.football.map(({ name, position, chances_created }) => (
-			        <div key={name}>
-			          <p>{name}{position}</p>
-			          <ShowStatPanel/>
+			        <div key={name}>		  
+			          <ShowStatPanel player1_stats={this.state.player1_stats} player2_stats={this.state.player2_stats}/>
 			        </div>
-			      ));
+			      ));}
 			    }}
-			  </Query>	
+			  </Query>
 		    </div>
 		  	</ApolloProvider>
 
+		  	</Grid>
 			</div>
 		);
 	}
